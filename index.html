@@ -159,6 +159,7 @@ textarea { min-height: 64px; resize: vertical; }
     <p class="hint" id="hint">Opens WhatsApp with your order typed in. Press send there to place it.</p>
   </section>
   <p class="foot">Stock is limited. An order is only confirmed once I reply on WhatsApp.</p>
+  <p class="foot" id="visits" hidden></p>
 </div>
 
 <div class="lb" id="lb" hidden role="dialog" aria-modal="true" aria-label="Photos">
@@ -387,7 +388,24 @@ async function init() {
   $("updated").textContent = (UPDATED ? "Updated " + UPDATED + ". " : "") + "Tap + to add what you want, then send the order.";
   renderChips(); renderList(); renderOrder();
 }
+/* Visitor counter (free counterapi.dev service). Each browser is counted once; open the page with ?nocount to stop your own visits being counted. */
+async function visitCount() {
+  const base = "https://api.counterapi.dev/v1/raviksingh13-stock/visitors";
+  let seen = false;
+  try {
+    if (/[?&]nocount\b/.test(location.search)) localStorage.setItem("stock-visit-counted", "1");
+    seen = localStorage.getItem("stock-visit-counted") === "1";
+  } catch (e) {}
+  try {
+    const r = await fetch(seen ? base : base + "/up");
+    if (!r.ok) throw new Error(r.status);
+    const d = await r.json();
+    if (!seen) { try { localStorage.setItem("stock-visit-counted", "1"); } catch (e) {} }
+    if (typeof d.count === "number") { const v = $("visits"); v.textContent = "Visitors: " + d.count.toLocaleString("en-AU"); v.hidden = false; }
+  } catch (e) { /* counter unavailable: leave it hidden */ }
+}
 init();
+visitCount();
 </script>
 </body>
 </html>
