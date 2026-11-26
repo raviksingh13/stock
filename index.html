@@ -388,20 +388,22 @@ async function init() {
   $("updated").textContent = (UPDATED ? "Updated " + UPDATED + ". " : "") + "Tap + to add what you want, then send the order.";
   renderChips(); renderList(); renderOrder();
 }
-/* Visitor counter (free counterapi.dev service). Each browser is counted once; open the page with ?nocount to stop your own visits being counted. */
+/* Visitor counter (free Abacus service, no signup). Each browser is counted once; open the page with ?nocount to stop your own visits being counted. */
 async function visitCount() {
-  const base = "https://api.counterapi.dev/v1/raviksingh13-stock/visitors";
+  const base = "https://abacus.jasoncameron.dev/";
+  const key = "raviksingh13-stock/visitors";
   let seen = false;
   try {
     if (/[?&]nocount\b/.test(location.search)) localStorage.setItem("stock-visit-counted", "1");
     seen = localStorage.getItem("stock-visit-counted") === "1";
   } catch (e) {}
   try {
-    const r = await fetch(seen ? base : base + "/up");
+    let r = await fetch(base + (seen ? "get/" : "hit/") + key);
+    if (seen && r.status === 404) r = await fetch(base + "hit/" + key);
     if (!r.ok) throw new Error(r.status);
     const d = await r.json();
     if (!seen) { try { localStorage.setItem("stock-visit-counted", "1"); } catch (e) {} }
-    if (typeof d.count === "number") { const v = $("visits"); v.textContent = "Visitors: " + d.count.toLocaleString("en-AU"); v.hidden = false; }
+    if (typeof d.value === "number") { const v = $("visits"); v.textContent = "Visitors: " + d.value.toLocaleString("en-AU"); v.hidden = false; }
   } catch (e) { /* counter unavailable: leave it hidden */ }
 }
 init();
