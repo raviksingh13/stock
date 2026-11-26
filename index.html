@@ -109,6 +109,10 @@ textarea { min-height: 64px; resize: vertical; }
 .bar button { background: var(--accent); color: var(--accent-fg); border: 0; border-radius: 8px; padding: 10px 16px; font: 600 14px var(--font-body); cursor: pointer; }
 .bar .sum { font-variant-numeric: tabular-nums; font-weight: 600; }
 .foot { color: var(--muted); font-size: 12.5px; margin-top: 18px; }
+.pickup { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; margin-top: 18px; }
+.pickup h2 { font-family: var(--font-display); font-weight: 700; font-size: 1.1rem; margin: 0 0 6px; }
+.pickup .addr { font-weight: 600; margin: 0; }
+.pickup .near { color: var(--muted); margin: 2px 0 12px; }
 @media (max-width: 380px) { .card { grid-template-columns: 88px minmax(0, 1fr); } .photo svg { width: 44px; height: 44px; } }
 @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
 .photo.has { cursor: zoom-in; position: relative; }
@@ -127,10 +131,17 @@ textarea { min-height: 64px; resize: vertical; }
   <h1>Laptop Stock List</h1>
   <p class="sub" id="updated"></p>
   <ul class="facts">
-    <li>Pre-owned</li><li>Adelaide pick-up</li><li>Prices in AUD</li><li>Confirmed on WhatsApp</li>
+    <li>Pre-owned</li><li>Pick-up in Bowden SA 5007</li><li>Prices in AUD</li><li>Confirmed on WhatsApp</li>
   </ul>
   <div class="chips" id="chips" role="group" aria-label="Filter by type"></div>
   <div class="list" id="list"></div>
+
+  <section class="pickup" id="pickup" aria-labelledby="pickup-h">
+    <h2 id="pickup-h">Pick-up location</h2>
+    <p class="addr">4 Gibson Street, Bowden SA 5007</p>
+    <p class="near">Near Bowden train station.</p>
+    <a class="btn" href="https://www.google.com/maps/search/?api=1&amp;query=4+Gibson+Street+Bowden+SA+5007" target="_blank" rel="noopener">Open in Maps</a>
+  </section>
 
   <section class="order" id="order" aria-labelledby="order-h">
     <h2 id="order-h">Your order</h2>
