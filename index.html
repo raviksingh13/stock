@@ -203,7 +203,8 @@ function parseStock(text) {
     if (!row.id || !row.name) return;
     const p = parseFloat(String(row.price).replace(/[$,]/g, ""));
     items.push({ id: row.id, cat: row.category || "Other", icon: ICON_BY_CAT[row.category] || "laptop",
-      name: row.name, spec: row.spec, cpu: row.processor || "", ram: row.ram || "", disk: row.storage || "", cond: row.condition || "Pre-owned", price: isNaN(p) ? null : p, stock: parseInt(row.stock, 10) || 0 });
+      name: row.name, spec: row.spec, cpu: row.processor || "", ram: row.ram || "", disk: row.storage || "", cond: row.condition || "Pre-owned", price: isNaN(p) ? null : p, stock: parseInt(row.stock, 10) || 0,
+      dealQty: parseInt(row.deal_qty, 10) || 0, dealPrice: isNaN(parseFloat(row.deal_price)) ? null : parseFloat(row.deal_price) });
   });
   return items.filter(i => i.stock > 0);
 }
@@ -261,6 +262,9 @@ function icon(name) {
 }
 const $ = id => document.getElementById(id);
 const money = n => "$" + n.toLocaleString("en-AU");
+const lineTotal = (it, q) => (it.dealQty && it.dealPrice != null)
+  ? Math.floor(q / it.dealQty) * it.dealPrice + (q % it.dealQty) * it.price
+  : it.price * q;
 const qty = {};
 let filter = "All";
 
@@ -294,6 +298,7 @@ function renderList() {
     }
     const meta = el("div", "meta");
     meta.appendChild(el("span", "tag", it.cond));
+    if (it.dealQty && it.dealPrice != null) meta.appendChild(el("span", "tag", "Buy " + it.dealQty + " for " + money(it.dealPrice)));
     if (it.stock <= 2) meta.appendChild(el("span", "tag low", "Only " + it.stock + " left"));
     body.appendChild(meta);
     const row = el("div", "row");
@@ -316,9 +321,9 @@ function renderList() {
 
 function orderText() {
   const lines = ITEMS.filter(i => qty[i.id]).map(i =>
-    "• " + qty[i.id] + " × " + i.name + (i.price == null ? " (price to confirm)" : " — " + money(i.price * qty[i.id])));
+    "• " + qty[i.id] + " × " + i.name + (i.price == null ? " (price to confirm)" : " — " + money(lineTotal(i, qty[i.id]))));
   let known = 0, unknown = false;
-  ITEMS.forEach(i => { if (qty[i.id]) { if (i.price == null) unknown = true; else known += i.price * qty[i.id]; } });
+  ITEMS.forEach(i => { if (qty[i.id]) { if (i.price == null) unknown = true; else known += lineTotal(i, qty[i.id]); } });
   let t = "Hi, I'd like to order:\n" + lines.join("\n");
   t += "\nTotal: " + money(known) + (unknown ? " + items to confirm" : "");
   const who = $("who").value.trim(), note = $("note").value.trim();
@@ -333,9 +338,9 @@ function renderOrder() {
   let known = 0, unknown = false, count = 0;
   picked.forEach(i => {
     const li = el("li"); li.appendChild(el("span", null, qty[i.id] + " × " + i.name));
-    li.appendChild(el("span", null, i.price == null ? "ask" : money(i.price * qty[i.id])));
+    li.appendChild(el("span", null, i.price == null ? "ask" : money(lineTotal(i, qty[i.id]))));
     ul.appendChild(li); count += qty[i.id];
-    if (i.price == null) unknown = true; else known += i.price * qty[i.id];
+    if (i.price == null) unknown = true; else known += lineTotal(i, qty[i.id]);
   });
   $("empty").hidden = picked.length > 0;
   $("totalrow").hidden = picked.length === 0;
