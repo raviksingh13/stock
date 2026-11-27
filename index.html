@@ -145,7 +145,7 @@ textarea { min-height: 64px; resize: vertical; }
 
   <section class="order" id="order" aria-labelledby="order-h">
     <h2 id="order-h">Your order</h2>
-    <p class="empty" id="empty">Nothing added yet. Use + on any item above.</p>
+    <p class="empty" id="empty">Nothing added yet. Use + on any item above, or just message me with a question.</p>
     <ul class="lines" id="lines"></ul>
     <div class="total" id="totalrow" hidden><span>Total</span><span id="total"></span></div>
     <label for="who">Your name</label>
@@ -153,10 +153,10 @@ textarea { min-height: 64px; resize: vertical; }
     <label for="note">Note (optional)</label>
     <textarea id="note" placeholder="Pick-up day or time, questions"></textarea>
     <div class="actions">
-      <a class="btn primary" id="send" href="#" target="_blank" rel="noopener" aria-disabled="true">Send order on WhatsApp</a>
+      <a class="btn primary" id="send" href="#" target="_blank" rel="noopener" aria-disabled="false">Message me on WhatsApp</a>
       <button class="btn" id="copy" type="button">Copy order message</button>
     </div>
-    <p class="hint" id="hint">Opens WhatsApp with your order typed in. Press send there to place it.</p>
+    <p class="hint" id="hint">No need to pick anything first. Opens WhatsApp so you can ask me a question.</p>
   </section>
   <p class="foot">Stock is limited. An order is only confirmed once I reply on WhatsApp.</p>
   <p class="foot" id="visits" hidden></p>
@@ -325,9 +325,15 @@ function orderText() {
     "• " + qty[i.id] + " × " + i.name + (i.price == null ? " (price to confirm)" : " — " + money(lineTotal(i, qty[i.id]))));
   let known = 0, unknown = false;
   ITEMS.forEach(i => { if (qty[i.id]) { if (i.price == null) unknown = true; else known += lineTotal(i, qty[i.id]); } });
+  const who = $("who").value.trim(), note = $("note").value.trim();
+  if (!lines.length) {
+    let q = "Hi, I'm interested in your laptop stock and have a question.";
+    if (who) q += "\nName: " + who;
+    if (note) q += "\nNote: " + note;
+    return q;
+  }
   let t = "Hi, I'd like to order:\n" + lines.join("\n");
   t += "\nTotal: " + money(known) + (unknown ? " + items to confirm" : "");
-  const who = $("who").value.trim(), note = $("note").value.trim();
   if (who) t += "\nName: " + who;
   if (note) t += "\nNote: " + note;
   return t;
@@ -347,17 +353,17 @@ function renderOrder() {
   $("totalrow").hidden = picked.length === 0;
   $("total").textContent = money(known) + (unknown ? " + items to confirm" : "");
   const send = $("send");
-  send.setAttribute("aria-disabled", String(picked.length === 0));
-  $("copy").disabled = picked.length === 0;
+  send.setAttribute("aria-disabled", "false");
+  $("copy").disabled = false;
   const bar = $("bar"); bar.hidden = picked.length === 0;
   $("barsum").textContent = count + (count === 1 ? " item" : " items") + " · " + money(known) + (unknown ? " +" : "");
-  if (picked.length) {
-    const base = /^https:\/\/wa\.me\//.test(WHATSAPP) ? WHATSAPP.replace(/[?#].*$/, "") : WHATSAPP ? "https://wa.me/" + WHATSAPP.replace(/\D/g, "") : "https://wa.me/";
-    send.href = base + "?text=" + encodeURIComponent(orderText());
-  } else send.removeAttribute("href");
-  $("hint").textContent = WHATSAPP
-    ? "Opens WhatsApp with your order typed in. Press send there to place it."
-    : "Opens WhatsApp so you can choose who to send the order to.";
+  const base = /^https:\/\/wa\.me\//.test(WHATSAPP) ? WHATSAPP.replace(/[?#].*$/, "") : WHATSAPP ? "https://wa.me/" + WHATSAPP.replace(/\D/g, "") : "https://wa.me/";
+  send.href = base + "?text=" + encodeURIComponent(orderText());
+  send.textContent = picked.length ? "Send order on WhatsApp" : "Message me on WhatsApp";
+  $("copy").textContent = picked.length ? "Copy order message" : "Copy message";
+  $("hint").textContent = picked.length
+    ? (WHATSAPP ? "Opens WhatsApp with your order typed in. Press send there to place it." : "Opens WhatsApp so you can choose who to send the order to.")
+    : "No need to pick anything first. Opens WhatsApp so you can ask me a question.";
 }
 
 $("who").addEventListener("input", renderOrder);
