@@ -113,6 +113,9 @@ textarea { min-height: 64px; resize: vertical; }
 .pickup h2 { font-family: var(--font-display); font-weight: 700; font-size: 1.1rem; margin: 0 0 6px; }
 .pickup .addr { font-weight: 600; margin: 0; }
 .pickup .near { color: var(--muted); margin: 2px 0 12px; }
+.qr { text-align: center; }
+.qr .near { margin-bottom: 12px; }
+.qr img { width: 220px; max-width: 100%; height: auto; background: #fff; padding: 0; }
 @media (max-width: 380px) { .card { grid-template-columns: 88px minmax(0, 1fr); } .photo svg { width: 44px; height: 44px; } }
 @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
 .photo.has { cursor: zoom-in; position: relative; }
@@ -141,6 +144,12 @@ textarea { min-height: 64px; resize: vertical; }
     <p class="addr">4 Gibson Street, Bowden SA 5007</p>
     <p class="near">Near Bowden train station.</p>
     <a class="btn" href="https://www.google.com/maps/search/?api=1&amp;query=4+Gibson+Street+Bowden+SA+5007" target="_blank" rel="noopener">Open in Maps</a>
+  </section>
+
+  <section class="pickup qr" id="qr" aria-labelledby="qr-h">
+    <h2 id="qr-h">Scan to message me on WhatsApp</h2>
+    <p class="near">Open your phone camera or WhatsApp and scan this code to start a chat.</p>
+    <img src="whatsapp-qr.png" alt="WhatsApp QR code. Scan it to start a chat with Ravi" width="220" height="220">
   </section>
 
   <section class="order" id="order" aria-labelledby="order-h">
